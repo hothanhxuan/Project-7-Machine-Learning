@@ -16,12 +16,12 @@ Tools Used: Machine Learning - Python | Power BI
 
 ## 📑 Table of Contents
 
-1. 🌱 [Data Preprocessing](#data-preprocessing)
-2. 🔍 [Exploratory Data Analysis (EDA)](#exploratory-data-analysis-eda)
-3. 📊 [Model Training & Evaluation](#model-training--evaluation)
-4. ⚙️ [Hyperparameter Tuning](#hyperparameter-tuning)
+1. 🌱 [Data Preprocessing](#part-1-preprocessing)
+2. 🔍 [Exploratory Data Analysis (EDA)](#part-2-eda)
+3. 📊 [Model Training & Evaluation](#part-3-training)
+4. ⚙️ [Hyperparameter Tuning](#part-4-tuning)
 5. 🧑‍💻 [Customer Segmentation Using KMeans](#part-5-segmentation)
-6. 💡 [Key Findings & Recommendations](#key-findings--recommendations)
+6. 💡 [Key Findings & Recommendations](#part-6-findings)
 
 
 ## 📌 Background & Overview
