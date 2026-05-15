@@ -597,20 +597,31 @@ for i in range(1, 11):
     kmeans = KMeans(n_clusters=i, init='k-means++', random_state=42)
     kmeans.fit(PCA_ds)
     ss.append(kmeans.inertia_)  # WCSS (Within-Cluster Sum of Squares)
+
+# Plot the Elbow method
+plt.figure(figsize=(10,5))
+plt.plot(range(1, max_clusters+1), ss, marker='o', linestyle='--')
+plt.title('Elbow Method')
+plt.xlabel('Number of clusters')
+plt.ylabel('WCSS')
+plt.show()
+
+# Visualize clusters in PCA space
+temp_clusters = KMeans(n_clusters=4, random_state=42).fit_predict(PCA_ds)
+
+sns.scatterplot(x='PC1', y='PC2', hue=temp_clusters, data=PCA_ds, palette='Set2')
+plt.title('PCA 2D visualization of churn clusters')
+plt.show()
+
+# Apply K-Means (final)
+
+kmeans = KMeans(n_clusters=4, init='k-means++', random_state=42)
+clusters = kmeans.fit_predict(PCA_ds)
 ```
 
 [Out 14]:
-```text
-📉 Elbow Method — WCSS by Number of Clusters:
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  K=1  ████████████████████████████████  High WCSS
-  K=2  ████████████████████              ↓
-  K=3  ███████████████                   ↓
-  K=4  ████████████                      ← Elbow point ✅
-  K=5  ███████████                       Diminishing returns
-  K=6  ██████████                        ↓
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-```
+
+![Image](https://github.com/user-attachments/assets/97ac458d-f9d4-4ab7-9e2e-8039ef80903b)
 
 #### **💡 Insight**
 K=4 shows the clearest "elbow" — making it the optimal cluster count.
@@ -651,7 +662,8 @@ plt.show()
 ```
 
 [Out 16]:
-*(A 2D scatterplot visualizing the 4 distinct clusters across Principal Components 1 and 2)*
+
+![Image](https://github.com/user-attachments/assets/30bf86c0-c2c9-4414-8962-3bbc433a0c22)
 
 #### **💡 Insight**
 The scatter plot shows 4 visually separable groups in the PC1-PC2 plane, confirming the clustering is capturing real behavioral patterns.
