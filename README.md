@@ -20,7 +20,7 @@ Tools Used: Machine Learning - Python | Power BI
 2. 🔍 [Exploratory Data Analysis (EDA)](#-exploratory-data-analysis-eda)
 3. 📊 [Model Training & Evaluation](#-model-training--evaluation)
 4. ⚙️ [Hyperparameter Tuning](#%EF%B8%8F-hyperparameter-tuning)
-5. 🧑‍💻 [Customer Segmentation Using KMeans](#-customer-segmentation-using-kmeans)
+5. 👥 [Customer Segmentation Using KMeans](#-customer-segmentation-using-kmeans)
 6. 💡 [Key Findings & Recommendations](#-key-findings--recommendations)
 
 
@@ -553,7 +553,7 @@ Test balanced accuracy:  0.9550
 ---
 
 
-## 🧑‍💻 Customer Segmentation Using KMeans
+## 👥 Customer Segmentation Using KMeans
 
 ### Question 3: Segment churned users for targeted promotions
 
