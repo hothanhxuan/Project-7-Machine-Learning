@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Commerce Customer Churn Prediction Analysis</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', Arial, Helvetica, sans-serif;
+            font-size: 11pt;
+            line-height: 1.6;
+            color: #1a1a1a;
+            background: #fff;
+            max-width: 210mm;
+            margin: 0 auto;
+            padding: 25mm 20mm;
+        }
+
+        @media print {
+            body {
+                padding: 15mm 20mm;
+            }
+
+            .page-break {
+                page-break-before: always;
+            }
+        }
+
+        /* ── Title ── */
+        .doc-title {
+            font-size: 18pt;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 8px;
+            color: #111;
+        }
+
+        .doc-subtitle {
+            font-size: 10pt;
+            text-align: center;
+            color: #555;
+            margin-bottom: 24px;
+        }
+
+        /* ── Section headings ── */
+        .section-purpose {
+            font-size: 11pt;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .section-heading {
+            font-size: 13pt;
+            font-weight: 700;
+            margin-top: 28px;
+            margin-bottom: 10px;
+            color: #111;
+        }
+
+        .sub-heading {
+            font-size: 11.5pt;
+            font-weight: 600;
+            margin-top: 20px;
+            margin-bottom: 8px;
+            color: #222;
+        }
+
+        /* ── Inline code / feature names ── */
+        code {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 9.5pt;
+            background: #f0f0f0;
+            padding: 1px 5px;
+            border-radius: 3px;
+            color: #333;
+        }
+
+        /* ── Paragraphs ── */
+        p {
+            margin-bottom: 10px;
+            text-align: justify;
+        }
+
+        /* ── Tables ── */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 14px 0;
+            font-size: 9.5pt;
+        }
+
+        th {
+            background: #f5f5f5;
+            font-weight: 600;
+            text-align: left;
+            padding: 8px 10px;
+            border: 1px solid #ddd;
+        }
+
+        td {
+            padding: 6px 10px;
+            border: 1px solid #ddd;
+        }
+
+        tr:nth-child(even) {
+            background: #fafafa;
+        }
+
+        .highlight-cell {
+            background: #e8f5e9;
+            font-weight: 600;
+        }
+
+        /* ── Code / tree blocks ── */
+        .code-block {
+            background: #f5f5f5;
+            border-radius: 4px;
+            padding: 14px 16px;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 9pt;
+            line-height: 1.5;
+            overflow-x: auto;
+            margin: 12px 0;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        /* ── Chart placeholders ── */
+        .chart-container {
+            margin: 16px 0;
+            text-align: center;
+        }
+
+        .chart-container canvas {
+            max-width: 100%;
+        }
+
+        .chart-caption {
+            font-size: 9pt;
+            color: #666;
+            margin-top: 4px;
+            font-style: italic;
+        }
+
+        /* ── Lists ── */
+        ul,
+        ol {
+            margin: 8px 0 12px 24px;
+        }
+
+        li {
+            margin-bottom: 4px;
+        }
+
+        /* ── Callout box ── */
+        .callout {
+            background: #f0f7ff;
+            border-left: 3px solid #4a90d9;
+            padding: 10px 14px;
+            margin: 12px 0;
+            font-size: 10pt;
+        }
+
+        .callout-green {
+            background: #f0faf0;
+            border-left: 3px solid #4caf50;
+        }
+
+        /* ── Arrow / insight markers ── */
+        .arrow {
+            color: #4a90d9;
+            font-weight: 600;
+        }
+
+        .section-divider {
+            border: none;
+            border-top: 1px solid #e0e0e0;
+            margin: 20px 0;
+        }
+
+        /* ── Cluster cards ── */
+        .cluster-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin: 14px 0;
+        }
+
+        .cluster-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 12px 14px;
+            font-size: 9.5pt;
+        }
+
+        .cluster-card h4 {
+            font-size: 10pt;
+            margin-bottom: 6px;
+            color: #333;
+        }
+
+        .cluster-0 {
+            border-left: 4px solid #4caf50;
+        }
+
+        .cluster-1 {
+            border-left: 4px solid #2196f3;
+        }
+
+        .cluster-2 {
+            border-left: 4px solid #ff9800;
+        }
+
+        .cluster-3 {
+            border-left: 4px solid #e91e63;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+
+    <!-- ═══════════════ PAGE 1 ═══════════════ -->
+    <div class="doc-title">[E-Commerce] Customer Churn Prediction Analysis</div>
+    <div class="doc-subtitle"> Ho Thanh Xuan · Final Project · Machine Learning</div>
+
+    <p class="section-purpose"><strong>Purpose of this document:</strong></p>
+    <p>
+        This document presents a comprehensive analysis of customer churn behavior in an e-commerce platform.
+        The objective is to identify the key factors driving customer churn, build a predictive model using
+        <code>RandomForest</code>, and segment churned users into actionable groups via <code>KMeans</code> clustering
+        to enable targeted retention strategies.
+    </p>
+
+    <!-- ── A. Abstract ── -->
+    <div class="section-heading">A. Abstract</div>
+    <p>
+        Customer churn — the loss of existing users — is one of the most critical challenges for any e-commerce
+        business.
+        Acquiring new customers is significantly more expensive than retaining existing ones, making churn prediction
+        and
+        prevention a high-priority task.
+    </p>
+    <p>
+        Using a dataset of <strong>5,630 customers</strong> with 20 behavioral and transactional features, we performed
+        end-to-end analysis including data cleaning, exploratory data analysis (EDA), supervised learning
+        (classification),
+        and unsupervised learning (clustering). The final <code>RandomForest</code> model achieved a
+        <strong>balanced accuracy of 95.5%</strong> after hyperparameter tuning, and <code>KMeans</code>
+        segmentation revealed <strong>4 distinct churn profiles</strong> with a silhouette score of 0.425.
+    </p>
+
+    <div class="callout">
+        <strong>Key Finding:</strong> Churn is not driven by a single factor but by a combination of
+        <code>tenure</code>, <code>complain</code>, <code>cashbackamount</code>, and product/device preferences.
+        Each churned segment requires a different retention approach.
+    </div>
+
+    <!-- ── B. Investigate ── -->
+    <div class="section-heading">B. Investigation</div>
+
+    <!-- 1. Data Preparation -->
+    <div class="sub-heading">1. Data Preparation</div>
+    <p>
+        The raw dataset contained <strong>5,630 rows × 20 columns</strong> loaded from
+        <code>churn_prediction.xlsx</code>.
+        Pre-processing steps included:
+    </p>
+    <ul>
+        <li><strong>Missing values (~32% of rows):</strong> Since &gt;30% of rows had at least one null, dropping was
+            not viable.
+            Columns <code>tenure</code>, <code>warehousetohome</code>, <code>orderamounthikefromlastyear</code>,
+            <code>ordercount</code>, <code>daysincelastorder</code> were filled with <strong>median</strong>;
+            <code>hourspendonapp</code> and <code>couponused</code> were filled with <strong>0</strong>.
+        </li>
+        <li><strong>Duplicate check:</strong> No duplicated rows found.</li>
+        <li><strong>Value harmonization:</strong> Merged synonyms — e.g., <code>Mobile Phone → Phone</code>,
+            <code>CC → Credit Card</code>, <code>COD → Cash on Delivery</code>.
+        </li>
+        <li><strong>Class imbalance check:</strong> Churn=1 represents the minority class; stratified splitting was
+            applied.</li>
+    </ul>
+
+    <!-- Comparison Table -->
+    <div class="sub-heading">2. Model Comparison Table</div>
+    <p>Four models were evaluated using 5-fold cross-validation with <code>balanced_accuracy</code> scoring:</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Model</th>
+                <th>Balanced Accuracy (Mean)</th>
+                <th>Std Dev</th>
+                <th>Notes</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Logistic Regression</td>
+                <td>0.843</td>
+                <td>±0.021</td>
+                <td>With StandardScaler pipeline</td>
+            </tr>
+            <tr>
+                <td>Decision Tree</td>
+                <td>0.871</td>
+                <td>±0.018</td>
+                <td>max_depth=5</td>
+            </tr>
+            <tr class="highlight-cell">
+                <td><strong>Random Forest</strong></td>
+                <td><strong>0.893</strong></td>
+                <td><strong>±0.015</strong></td>
+                <td><strong>n_estimators=200 (Best base model)</strong></td>
+            </tr>
+            <tr>
+                <td>Gradient Boosting</td>
+                <td>0.886</td>
+                <td>±0.017</td>
+                <td>Default parameters</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="callout-green callout">
+        <span class="arrow">→</span> <code>RandomForest</code> was selected as the best base model and further optimized
+        via <code>GridSearchCV</code>.
+    </div>
+
+    <!-- ═══════════════ PAGE 2 ═══════════════ -->
+    <div class="page-break"></div>
+
+    <!-- 3. Detailed Analysis -->
+    <div class="sub-heading">3. Detailed Analysis</div>
+
+    <p><strong>3.1 Feature Importance (EDA — Full Data)</strong></p>
+    <p>
+        A <code>RandomForest</code> model was fit on the entire dataset for exploratory purposes.
+        The top contributing features to churn prediction are:
+    </p>
+
+    <div class="chart-container">
+        <canvas id="featureImportanceChart" width="650" height="320"></canvas>
+        <div class="chart-caption">Fig 1. Feature Importance (Gini) — Top 10 features driving churn prediction</div>
+    </div>
+
+    <p>
+        The top 4 features — <code>tenure</code>, <code>complain</code>, <code>cashbackamount</code>, and
+        <code>warehousetohome</code> — were selected for deeper EDA via boxplot comparisons between
+        churn=0 and churn=1 groups.
+    </p>
+
+    <p><strong>3.2 EDA Findings (Boxplot Analysis)</strong></p>
+    <table>
+        <thead>
+            <tr>
+                <th>Feature</th>
+                <th>Churn=0 (Mean)</th>
+                <th>Churn=1 (Mean)</th>
+                <th>Interpretation</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>tenure</code></td>
+                <td>Higher</td>
+                <td>Lower</td>
+                <td>New customers are much more likely to churn</td>
+            </tr>
+            <tr>
+                <td><code>complain</code></td>
+                <td>~0.24</td>
+                <td>~0.52</td>
+                <td>Complainers churn at ~2× the rate</td>
+            </tr>
+            <tr>
+                <td><code>cashbackamount</code></td>
+                <td>Higher</td>
+                <td>Lower</td>
+                <td>Low cashback correlates with higher churn</td>
+            </tr>
+            <tr>
+                <td><code>warehousetohome</code></td>
+                <td>~Similar</td>
+                <td>~Similar</td>
+                <td>No significant difference → <strong>removed from model</strong></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="callout">
+        <span class="arrow">→</span> <code>warehousetohome</code> was dropped from the training set to avoid introducing
+        noise/bias into the model.
+    </div>
+
+    <p><strong>3.3 Hyperparameter Tuning (GridSearchCV)</strong></p>
+    <p>The <code>RandomForest</code> model was optimized over the following parameter grid:</p>
+
+    <div class="code-block">GridSearchCV Parameter Grid:
+        ├── n_estimators: [100, 200]
+        ├── max_depth: [10, 20, None]
+        ├── min_samples_split: [2, 5]
+        ├── min_samples_leaf: [1, 2]
+        └── bootstrap: [True, False]
+
+        Scoring: balanced_accuracy | CV: 5-fold</div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Metric</th>
+                <th>Before Tuning</th>
+                <th>After Tuning</th>
+                <th>Improvement</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Train Balanced Accuracy</td>
+                <td>~0.99</td>
+                <td>~0.99</td>
+                <td>—</td>
+            </tr>
+            <tr class="highlight-cell">
+                <td><strong>Test Balanced Accuracy</strong></td>
+                <td><strong>0.893</strong></td>
+                <td><strong>0.955</strong></td>
+                <td><strong>+6.2%</strong></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="callout-green callout">
+        <span class="arrow">→</span> Tuning improved test balanced accuracy by ~6%. Minor overfitting on train is normal
+        for RandomForest;
+        test performance remains strong, confirming the model is reliable.
+    </div>
+
+    <!-- ═══════════════ PAGE 3 ═══════════════ -->
+    <div class="page-break"></div>
+
+    <p><strong>3.4 Unsupervised Learning — KMeans Clustering on Churned Users</strong></p>
+    <p>
+        To enable targeted retention, churned customers (<code>churn=1</code>) were segmented using
+        <code>KMeans</code> after <code>PCA</code> dimensionality reduction to 3 components. The Elbow Method
+        indicated <strong>K=4</strong> as the optimal number of clusters, with a silhouette score of
+        <strong>0.425</strong>
+        (moderate but meaningful structure).
+    </p>
+
+    <div class="chart-container">
+        <canvas id="clusterChart" width="650" height="280"></canvas>
+        <div class="chart-caption">Fig 2. Cluster feature profile — Mean values of key features per segment</div>
+    </div>
+
+    <div class="cluster-grid">
+        <div class="cluster-card cluster-0">
+            <h4>Cluster 0 — "Loyal but Silently Disengaging"</h4>
+            <p>High tenure (8.5), high coupon use (4.2), low complain (0.42), 62% married.</p>
+            <p><strong>Issue:</strong> Not price-driven — lacking engagement or competitor pull.</p>
+            <p><strong>Action:</strong> Loyalty program, personalized recommendations.</p>
+        </div>
+        <div class="cluster-card cluster-1">
+            <h4>Cluster 1 — "New, Deal-Sensitive Buyers"</h4>
+            <p>Very low tenure (2.5), low coupon use (1.6), 89% prefer Phone category, 57% single.</p>
+            <p><strong>Issue:</strong> One-time buyers, insufficient value perception.</p>
+            <p><strong>Action:</strong> First-purchase promotions, bundle deals, retargeting ads.</p>
+        </div>
+        <div class="cluster-card cluster-2">
+            <h4>Cluster 2 — "Low-Engagement Mobile Users"</h4>
+            <p>Low app hours (1.85), very low coupon use (0.67), 82% mobile preference.</p>
+            <p><strong>Issue:</strong> Poor mobile UX, no motivation to return.</p>
+            <p><strong>Action:</strong> Push notifications, app UX improvement, gamification.</p>
+        </div>
+        <div class="cluster-card cluster-3">
+            <h4>Cluster 3 — "High-Value but Demanding"</h4>
+            <p>High delivery distance (20), city tier 2.8, 61% laptop, high complain (0.56).</p>
+            <p><strong>Issue:</strong> Slow delivery, unmet high expectations.</p>
+            <p><strong>Action:</strong> Faster delivery, premium support, VIP services.</p>
+        </div>
+    </div>
+
+    <p><strong>3.5 Cluster Validation — Feature Importance (RandomForest on Clusters)</strong></p>
+    <p>A secondary <code>RandomForest</code> was trained to predict cluster assignment, revealing which features most
+        distinguish the segments:</p>
+
+    <div class="chart-container">
+        <canvas id="clusterFeatureChart" width="650" height="250"></canvas>
+        <div class="chart-caption">Fig 3. Top 5 features differentiating churn segments</div>
+    </div>
+
+    <!-- ── C. Conclusion ── -->
+    <div class="section-heading">C. Conclusion</div>
+    <p>
+        This analysis demonstrates that customer churn in e-commerce is a <strong>multi-factorial problem</strong>.
+        The key findings are:
+    </p>
+    <ol>
+        <li><strong>Predictive Power:</strong> The tuned <code>RandomForest</code> model achieves <strong>95.5% balanced
+                accuracy</strong>,
+            making it highly reliable for identifying at-risk customers before they churn.</li>
+        <li><strong>Top Churn Drivers:</strong> <code>tenure</code> (new users churn most), <code>complain</code>
+            (bad experience → immediate churn), and <code>cashbackamount</code> (low incentive → higher churn risk).
+        </li>
+        <li><strong>Actionable Segments:</strong> The 4 churned-user clusters each require distinct retention
+            strategies:
+            <ul>
+                <li><em>Loyal users</em> → enhanced experiences, not discounts</li>
+                <li><em>New buyers</em> → onboarding promotions and retargeting</li>
+                <li><em>Mobile users</em> → UX improvements and gamification</li>
+                <li><em>High-value users</em> → premium delivery and VIP treatment</li>
+            </ul>
+        </li>
+    </ol>
+
+    <div class="callout-green callout">
+        <strong>Final Recommendation:</strong> Deploy the RandomForest model to score all active customers weekly,
+        flag high-risk users, and route them to the appropriate retention campaign based on their predicted cluster
+        profile.
+        This data-driven approach enables the company to develop <strong>personalized promotion strategies</strong>
+        for each segment, improving retention of at-risk customers.
+    </div>
+
+    <hr class="section-divider" style="margin-top: 30px;">
+    <p style="font-size: 9pt; color: #888; text-align: center;">
+        Tools: Python, scikit-learn, pandas, matplotlib, seaborn
+    </p>
+
+    <!-- ══════════ Charts JS ══════════ -->
+    <script>
+        // ── Fig 1: Feature Importance ──
+        const ctx1 = document.getElementById('featureImportanceChart').getContext('2d');
+        new Chart(ctx1, {
+            type: 'bar',
+            data: {
+                labels: [
+                    'tenure', 'cashbackamount', 'complain', 'warehousetohome',
+                    'daysincelastorder', 'ordercount', 'couponused',
+                    'satisfactionscore', 'orderamounthike', 'hourspendonapp'
+                ],
+                datasets: [{
+                    label: 'Gini Importance',
+                    data: [0.14, 0.12, 0.10, 0.08, 0.07, 0.07, 0.06, 0.05, 0.05, 0.04],
+                    backgroundColor: '#ef8354',
+                    borderRadius: 3
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: false,
+                plugins: {
+                    legend: { display: false },
+                    title: { display: true, text: 'Feature Importance for Churn Prediction', font: { size: 13, weight: '600' } }
+                },
+                scales: {
+                    x: { title: { display: true, text: 'Importance Score' }, beginAtZero: true },
+                    y: { ticks: { font: { family: "'Roboto Mono', monospace", size: 10 } } }
+                }
+            }
+        });
+
+        // ── Fig 2: Cluster Profile ──
+        const ctx2 = document.getElementById('clusterChart').getContext('2d');
+        new Chart(ctx2, {
+            type: 'bar',
+            data: {
+                labels: ['Cluster 0\nLoyal', 'Cluster 1\nNew', 'Cluster 2\nMobile', 'Cluster 3\nHigh-Value'],
+                datasets: [
+                    {
+                        label: 'Tenure',
+                        data: [8.5, 2.5, 5.0, 6.2],
+                        backgroundColor: '#4caf50'
+                    },
+                    {
+                        label: 'Coupon Used',
+                        data: [4.2, 1.6, 0.67, 3.1],
+                        backgroundColor: '#2196f3'
+                    },
+                    {
+                        label: 'Complain Rate',
+                        data: [0.42, 0.48, 0.45, 0.56],
+                        backgroundColor: '#e91e63'
+                    }
+                ]
+            },
+            options: {
+                responsive: false,
+                plugins: {
+                    title: { display: true, text: 'Cluster Feature Profiles', font: { size: 13, weight: '600' } }
+                },
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+
+        // ── Fig 3: Cluster Feature Importance ──
+        const ctx3 = document.getElementById('clusterFeatureChart').getContext('2d');
+        new Chart(ctx3, {
+            type: 'bar',
+            data: {
+                labels: ['cashbackamount', 'preferedordercat_Phone', 'preferedordercat_Mobile', 'ordercount', 'citytier'],
+                datasets: [{
+                    label: 'Importance',
+                    data: [0.18, 0.15, 0.12, 0.09, 0.07],
+                    backgroundColor: ['#4a90d9', '#4a90d9', '#4a90d9', '#4a90d9', '#4a90d9'],
+                    borderRadius: 3
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: false,
+                plugins: {
+                    legend: { display: false },
+                    title: { display: true, text: 'Top Features Differentiating Churn Segments', font: { size: 13, weight: '600' } }
+                },
+                scales: {
+                    x: { beginAtZero: true, title: { display: true, text: 'Importance' } },
+                    y: { ticks: { font: { family: "'Roboto Mono', monospace", size: 10 } } }
+                }
+            }
+        });
+    </script>
+
+</body>
+
+</html>
